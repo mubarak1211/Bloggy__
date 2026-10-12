@@ -7,13 +7,14 @@ import Blogs from './componets/Blogs';
 import UserBlogs from './componets/UserBlogs'
 import AddBlogs from './componets/AddBlogs'
 import BlogDetail from './componets/BlogDetail'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from './store';
 
 
 
 function App() {
   const dispatch = useDispatch();
+  const isDark = useSelector((state) => state.theme.isDarkmode);
 
   useEffect(()=>{
     const userId = localStorage.getItem("userId");
@@ -22,7 +23,7 @@ function App() {
     }
   },[dispatch]);
   
-  return <React.Fragment>
+  return <div className={`app-shell ${isDark ? "theme-dark" : "theme-light"}`}>
     <header>
       <Header/>
     </header>
@@ -36,7 +37,7 @@ function App() {
     </Routes>
     </main>
 
-  </React.Fragment>;
+  </div>;
 }
 
 export default App;

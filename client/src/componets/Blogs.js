@@ -4,29 +4,27 @@ import Blog from "./Blog";
 import config from "../config";
 
 const Blogs = () => {
-  const [blogs, setBlogs] = useState();
+  const [blogs, setBlogs] = useState([]);
   const sendRequest = async () => {
-    const res = await axios
-      .get(`${config.BASE_URL}/api/blogs`)
-      .catch((err) => console.log(err));
-    const data = await res.data;
-    return data;
+    const res = await axios.get(`${config.BASE_URL}/api/blogs`);
+    return res.data;
   };
   useEffect(() => {
-    sendRequest().then((data) => setBlogs(data.blogs));
+    sendRequest()
+      .then((response) => setBlogs(response.data.blogs))
+      .catch((err) => console.error("Failed to load blogs:", err));
   }, []);
-  console.log(blogs);
   return (
     <div>
-      {blogs &&
-        blogs.map((blog, index) => (
+      {blogs.map((blog) => (
           <Blog
+            key={blog._id}
             id={blog._id}
-            isUser={localStorage.getItem("userId") === blog.user._id}
+            isUser={localStorage.getItem("userId") === blog.user?._id}
             title={blog.title}
             desc={blog.desc}
             img={blog.img}
-            user={blog.user.name}
+            user={blog.user?.name || "Unknown user"}
             date={new Date(blog.date).toLocaleDateString()}
           />
         ))}

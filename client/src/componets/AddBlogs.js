@@ -4,18 +4,24 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import config from "../config";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useStyles } from "./utils";
 import placeholderImg from "../../src/placeholder.jpg"
 
-const labelStyles = { mb: 1, mt: 2, fontSize: "24px", fontWeight: "bold" };
+const labelStyles = {
+  display: "block",
+  mb: 0.75,
+  mt: 2.5,
+  fontSize: "0.9rem",
+  fontWeight: 700,
+  color: "var(--text)",
+};
 const AddBlogs = () => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const [inputs, setInputs] = useState({
     title: "",
     description: "",
     imageURL: "",
   });
+  const [error, setError] = useState("");
   const handleChange = (e) => {
     setInputs((prevState) => ({
       ...prevState,
@@ -23,91 +29,129 @@ const AddBlogs = () => {
     }));
   };
   const sendRequest = async () => {
-    const res = await axios
-      .post(`${config.BASE_URL}/api/blogs/add`, {
+    const res = await axios.post(`${config.BASE_URL}/api/blogs/add`, {
         title: inputs.title,
         desc: inputs.description,
         img: inputs.imageURL.trim() === "" ? placeholderImg : inputs.imageURL,
         user: localStorage.getItem("userId"),
-      })
-      .catch((err) => console.log(err));
-    const data = await res.data;
-    return data;
+      });
+    return res.data;
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(inputs);
-    sendRequest()
-      .then((data) => console.log(data))
-      .then(() => navigate("/blogs"));
+    setError("");
+    try {
+      await sendRequest();
+      navigate("/blogs");
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Request failed");
+    }
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
+    <Box sx={{ px: 2, py: { xs: 3, sm: 6 } }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mx: "auto", maxWidth: 680 }}>
         <Box
-          borderRadius={10}
-          boxShadow="10px 10px 20px #ccc"
-          padding={3}
-          margin={"auto"}
-          marginTop={3}
-          display="flex"
-          flexDirection={"column"}
-          width={"80%"}
+          sx={{
+            backgroundColor: "var(--surface)",
+            color: "var(--text)",
+            border: "1px solid var(--form-border)",
+            borderRadius: { xs: 3, sm: 4 },
+            boxShadow: "0 18px 50px rgba(31, 41, 64, 0.12)",
+            p: { xs: 2.5, sm: 4 },
+            transition: "background-color 450ms ease, color 450ms ease",
+          }}
         >
-          <Typography
-            className={classes.font}
-            padding={3}
-            color="grey"
-            variant="h2"
-            textAlign={"center"}
-          >
-            Post Your Blog
+          <Typography variant="h4" fontWeight={750} sx={{ color: "var(--text)" }}>
+            Create a blog
           </Typography>
-          <InputLabel className={classes.font} sx={labelStyles}>
+          <Typography sx={{ mt: 0.75, color: "var(--muted)" }}>
+            Add a title, share your story, and choose an image.
+          </Typography>
+
+          {error && (
+            <Typography role="alert" color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+
+          <InputLabel htmlFor="blog-title" sx={labelStyles}>
             Title
           </InputLabel>
           <TextField
-            className={classes.font}
+            id="blog-title"
             name="title"
             onChange={handleChange}
             value={inputs.title}
-            margin="auto"
-            variant="outlined"
+            placeholder="Give your post a clear title"
+            fullWidth
+            size="small"
+            required
+            sx={fieldStyles}
           />
-          <InputLabel className={classes.font} sx={labelStyles}>
+          <InputLabel htmlFor="blog-description" sx={labelStyles}>
             Description
           </InputLabel>
           <TextareaAutosize
-            className={classes.font}
+            id="blog-description"
             name="description"
             onChange={handleChange}
-            minRows={10}
-            margin="auto"
-            variant="outlined"
+            minRows={6}
             value={inputs.description}
+            placeholder="What would you like people to know?"
+            required
+            style={{
+              width: "100%",
+              minHeight: 150,
+              padding: "12px 14px",
+              border: "1px solid var(--form-border)",
+              borderRadius: 8,
+              background: "var(--field-surface)",
+              color: "var(--text)",
+              font: "inherit",
+              lineHeight: 1.6,
+              resize: "vertical",
+              outlineColor: "#7166b5",
+            }}
           />
-          <InputLabel className={classes.font} sx={labelStyles}>
-            ImageURL
+          <InputLabel htmlFor="blog-image" sx={labelStyles}>
+            Image URL <Typography component="span" variant="caption" sx={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</Typography>
           </InputLabel>
           <TextField
-            className={classes.font}
+            id="blog-image"
             name="imageURL"
             onChange={handleChange}
             value={inputs.imageURL}
-            margin="auto"
-            variant="outlined"
+            placeholder="https://example.com/image.jpg"
+            fullWidth
+            size="small"
+            sx={fieldStyles}
           />
-          <Button
-            sx={{ mt: 2, borderRadius: 4 }}
-            variant="contained"
-            type="submit"
-          >
-            Submit
-          </Button>
+          <Typography variant="caption" sx={{ display: "block", mt: 0.75, color: "var(--muted)" }}>
+            Leave this blank to use the default image.
+          </Typography>
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, mt: 3, flexDirection: { xs: "column-reverse", sm: "row" } }}>
+            <Button variant="outlined" onClick={() => navigate("/blogs")} sx={{ borderRadius: 2, px: 2.5 }}>
+              Cancel
+            </Button>
+            <Button variant="contained" type="submit" sx={{ borderRadius: 2, px: 3, fontWeight: 700 }}>
+              Publish blog
+            </Button>
+          </Box>
         </Box>
-      </form>
-    </div>
+      </Box>
+    </Box>
   );
+};
+
+const fieldStyles = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 2,
+    backgroundColor: "var(--field-surface)",
+    color: "var(--text)",
+  },
+  "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--form-border)" },
+  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#8b83c4" },
 };
 
 export default AddBlogs;

@@ -1,0 +1,120 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+main {
+  width: 100%;
+  padding-bottom: 32px;
+}
+
+.app-shell {
+  --surface: rgba(255, 255, 255, 0.92);
+  --text: #182235;
+  --muted: #4b5568;
+  --field-surface: rgba(255, 255, 255, 0.88);
+  --form-border: rgba(108, 121, 145, 0.28);
+  --nav-surface: rgba(250, 252, 255, 0.86);
+  --nav-border: rgba(108, 121, 145, 0.18);
+  --nav-selected: rgba(107, 93, 190, 0.12);
+  --nav-selected-text: #5d50a6;
+  --nav-icon-surface: rgba(255, 255, 255, 0.56);
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  color: var(--text);
+  background-color: #f2f5fa;
+  transition: background-color 500ms ease, color 500ms ease;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(ellipse at 12% 12%, rgba(95, 185, 195, 0.22), transparent 34%),
+    radial-gradient(ellipse at 88% 38%, rgba(193, 133, 177, 0.2), transparent 36%),
+    linear-gradient(145deg, #f7f9fc 0%, #eef2f8 55%, #f8f5f8 100%);
+  opacity: 1;
+}
+
+.app-shell::after {
+  background:
+    radial-gradient(ellipse at 12% 12%, rgba(32, 117, 135, 0.28), transparent 34%),
+    radial-gradient(ellipse at 88% 38%, rgba(113, 72, 130, 0.26), transparent 36%),
+    linear-gradient(145deg, #101827 0%, #172236 55%, #211c31 100%);
+  opacity: 0;
+}
+
+.app-shell.theme-dark {
+  --surface: rgba(27, 38, 56, 0.94);
+  --text: #eef3fb;
+  --muted: #c4cede;
+  --field-surface: rgba(15, 24, 39, 0.7);
+  --form-border: rgba(176, 190, 215, 0.24);
+  --nav-surface: rgba(17, 27, 43, 0.88);
+  --nav-border: rgba(176, 190, 215, 0.16);
+  --nav-selected: rgba(164, 148, 255, 0.16);
+  --nav-selected-text: #ddd6ff;
+  --nav-icon-surface: rgba(255, 255, 255, 0.04);
+  background-color: #101827;
+}
+
+.app-shell.theme-dark::before {
+  opacity: 0;
+}
+
+.app-shell.theme-dark::after {
+  opacity: 1;
+}
+
+.read-more-button {
+  margin: 10px 16px 8px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  color: #5d54a0;
+  background: rgba(111, 99, 184, 0.12);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.theme-dark .read-more-button {
+  color: #d4caff;
+  background: rgba(173, 151, 255, 0.16);
+}
+
+.read-more-button:hover {
+  background: rgba(111, 99, 184, 0.22);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

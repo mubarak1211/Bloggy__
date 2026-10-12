@@ -5,7 +5,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import config from "../config";
 
-const labelStyles = { mb: 1, mt: 2, fontSize: "24px", fontWeight: "bold" };
+const labelStyles = { mb: 1, mt: 2, fontSize: { xs: "1rem", sm: "1.25rem" }, fontWeight: "bold" };
 
 const BlogDetail = () => {
   const navigate = useNavigate();
@@ -66,23 +66,26 @@ const BlogDetail = () => {
       {blog ? (
         <form onSubmit={handleSubmit}>
           <Box
+            sx={{ backgroundColor: "var(--surface)", color: "var(--text)", transition: "background-color 450ms ease, color 450ms ease" }}
             border={3}
             borderColor="linear-gradient(90deg, rgba(58,75,180,1) 2%, rgba(116,49,110,1) 36%, rgba(2,0,161,1) 73%, rgba(69,92,252,1) 100%)"
             borderRadius={10}
             boxShadow="10px 10px 20px #ccc"
-            padding={3}
+            padding={{ xs: 2, sm: 3 }}
             margin={"auto"}
             marginTop={3}
             display="flex"
             flexDirection={"column"}
-            width={"80%"}
+            width="calc(100% - 32px)"
+            maxWidth={760}
           >
             <Typography
               fontWeight={"bold"}
               padding={3}
               color="grey"
-              variant="h2"
+              variant="h3"
               textAlign={"center"}
+              sx={{ color: "var(--text)" }}
             >
               Update Blog
             </Typography>

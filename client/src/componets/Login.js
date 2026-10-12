@@ -18,6 +18,7 @@ const Login = () => {
     password: "",
   });
   const [isSignup, setIsSignup] = useState(isSignupButtonPressed || false);
+  const [error, setError] = useState("");
   const handleChange = (e) => {
     setInputs((prevState) => ({
       ...prevState,
@@ -28,35 +29,25 @@ const Login = () => {
     setIsSignup(isSignupButtonPressed);
   }, [isSignupButtonPressed]);
   const sendRequest = async (type = "login") => {
-    console.log("inside send req");
-    console.log(`${config.BASE_URL}/api/users/${type}`);
-    const res = await axios
-      .post(`${config.BASE_URL}/api/users/${type}`, {
-        name: inputs.name,
-        email: inputs.email,
-        password: inputs.password,
-      })
-      .catch((err) => console.log(err));
-
-    const data = await res.data;
-    console.log("return");
-    console.log(data);
-    return data;
+    const res = await axios.post(`${config.BASE_URL}/api/users/${type}`, {
+      name: inputs.name,
+      email: inputs.email,
+      password: inputs.password,
+    });
+    return res.data;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(inputs);
-    if (isSignup) {
-      sendRequest("signup")
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
-    } else {
-      sendRequest()
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+    setError("");
+    try {
+      const response = await sendRequest(isSignup ? "signup" : "login");
+      const user = response.data.user;
+      localStorage.setItem("userId", user._id);
+      dispath(authActions.login());
+      naviagte("/blogs");
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Request failed");
     }
   };
   return (
@@ -69,14 +60,16 @@ const Login = () => {
           alignItems="center"
           justifyContent={"center"}
           boxShadow="10px 10px 20px #ccc"
+          sx={{ backgroundColor: "var(--surface)", color: "var(--text)", transition: "background-color 450ms ease, color 450ms ease" }}
           padding={3}
           margin="auto"
           marginTop={5}
           borderRadius={5}
         >
-          <Typography variant="h2" padding={3} textAlign="center">
+          <Typography variant="h2" padding={3} textAlign="center" sx={{ color: "var(--text)" }}>
             {isSignup ? "Signup" : "Login"}
           </Typography>
+          {error && <Typography color="error">{error}</Typography>}
           {isSignup && (
             <TextField
               name="name"
