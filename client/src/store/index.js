@@ -2,15 +2,20 @@ import { combineReducers, configureStore, createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { isLoggedIn: false },
+  initialState: { isLoggedIn: false, user: null },
   reducers: {
-    login(state) {
-      console.log("updating");
+    login(state, action) {
       state.isLoggedIn = true;
+      state.user = action.payload || state.user;
+    },
+    updateUser(state, action) {
+      state.user = action.payload;
     },
     logout(state) {
       localStorage.removeItem("userId");
+      localStorage.removeItem("authToken");
       state.isLoggedIn = false;
+      state.user = null;
     },
   },
 });

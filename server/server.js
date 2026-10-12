@@ -1,32 +1,40 @@
+require("dotenv").config();
+
 const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const connectDB = require("./config/db");
 const userRouter = require("./routes/user-routes");
 const blogRouter = require("./routes/blog-routes");
-const helmet = require("helmet");
-require("./config/db");
-const cors = require("cors");
+const { ApiError } = require("./utils/ApiError");
 
 const app = express();
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:3000";
 
-app.use(cors());
+app.use(cors({ origin: clientOrigin }));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+app.use(express.json({ limit: "2mb" }));
 
-//setting helmet middleware
-app.use(helmet(
-  {
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  }
-));
-
-app.set("view engine", "ejs");
-app.use(express.json());
-
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 app.use("/api/users", userRouter);
 app.use("/api/blogs", blogRouter);
-
-app.use("/api", (req, res, next) => {
-  res.send("hello");
+app.use((req, res) => {
+  res.status(404).json(new ApiError(404, "Route not found."));
 });
 
-//define port
+const startServer = async () => {
+  try {
+    await connectDB();
+    const port = Number(process.env.PORT) || 5001;
+    app.listen(port, () => console.log(`API server listening on port ${port}`));
+  } catch (error) {
+    console.error("Could not connect to MongoDB:", error.message);
+    process.exitCode = 1;
+  }
+};
 
-app.listen(5001, () => console.log("app started at 5001..."));
+if (require.main === module) startServer();
+
+module.exports = app;

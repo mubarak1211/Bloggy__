@@ -1,14 +1,15 @@
 import './App.css';
 import { Route, Routes } from "react-router-dom";
-import Header from './componets/Header';
+import Header from './components/Header';
 import React, { useEffect } from 'react';
-import Login from './componets/Login';
-import Blogs from './componets/Blogs';
-import UserBlogs from './componets/UserBlogs'
-import AddBlogs from './componets/AddBlogs'
-import BlogDetail from './componets/BlogDetail'
+import Login from './components/Login';
+import Blogs from './components/Blogs';
+import UserBlogs from './components/UserBlogs'
+import AddBlogs from './components/AddBlogs'
+import BlogDetail from './components/BlogDetail'
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from './store';
+import api from './api';
 
 
 
@@ -17,9 +18,12 @@ function App() {
   const isDark = useSelector((state) => state.theme.isDarkmode);
 
   useEffect(()=>{
-    const userId = localStorage.getItem("userId");
-    if(userId){
+    const token = localStorage.getItem("authToken");
+    if(token){
       dispatch(authActions.login());
+      api.get("/api/users/me")
+        .then((response) => dispatch(authActions.updateUser(response.data.data.user)))
+        .catch(() => dispatch(authActions.logout()));
     }
   },[dispatch]);
   

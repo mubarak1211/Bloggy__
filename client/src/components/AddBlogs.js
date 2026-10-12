@@ -1,7 +1,6 @@
 import { Box, Button, InputLabel, TextField, Typography } from "@mui/material";
-import axios from "axios";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
-import config from "../config";
+import api from "../api";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholderImg from "../../src/placeholder.jpg"
@@ -29,11 +28,10 @@ const AddBlogs = () => {
     }));
   };
   const sendRequest = async () => {
-    const res = await axios.post(`${config.BASE_URL}/api/blogs/add`, {
+    const res = await api.post("/api/blogs/add", {
         title: inputs.title,
         desc: inputs.description,
         img: inputs.imageURL.trim() === "" ? placeholderImg : inputs.imageURL,
-        user: localStorage.getItem("userId"),
       });
     return res.data;
   };

@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
-require('dotenv').config();
 
+mongoose.set("strictQuery", false);
 
-mongoose.set('strictQuery', false);
+const connectDB = async () => {
+  const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/Blog";
+  await mongoose.connect(mongoUri);
+  console.log(`Connected to MongoDB database: ${mongoose.connection.name}`);
+  return mongoose.connection;
+};
 
-
-mongoose.connect(process.env.MONGO_URI || "mongodb://mongo:27017/Blog").then(()=>{
-    console.log("connected!");
-}).catch((err)=>{
-    console.log(err);
-})
+module.exports = connectDB;

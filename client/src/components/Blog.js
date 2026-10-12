@@ -5,6 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
+  CircularProgress,
   IconButton,
   Typography,
 } from "@mui/material";
@@ -12,24 +13,34 @@ import React, { useState } from "react";
 import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useStyles } from "./utils";
-import config from "../config";
+import api from "../api";
 const Blogs = ({ title, desc, img, user, isUser, id, onDelete }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const classes = useStyles();
   const navigate = useNavigate();
   const handleEdit = () => {
     navigate(`/myBlogs/${id}`);
   };
   const deleteRequest = async () => {
-    const res = await axios.delete(`${config.BASE_URL}/api/blogs/${id}`);
+    const res = await api.delete(`/api/blogs/${id}`);
     return res.data;
   };
-  const handleDelete = () => {
-    deleteRequest()
-      .then(() => (onDelete ? onDelete() : navigate("/blogs")))
-      .catch((error) => console.error("Failed to delete blog:", error));
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteRequest();
+      if (onDelete) onDelete(id);
+      else navigate("/blogs");
+    } catch (error) {
+      setDeleteError(error.response?.data?.message || "Could not delete this blog. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
   return (
     <div>
@@ -57,8 +68,8 @@ const Blogs = ({ title, desc, img, user, isUser, id, onDelete }) => {
             <IconButton onClick={handleEdit} sx={{ marginLeft: "auto" }}>
               <ModeEditOutlineIcon color="warning" />
             </IconButton>
-            <IconButton onClick={handleDelete}>
-              <DeleteForeverIcon color="error" />
+            <IconButton onClick={handleDelete} disabled={isDeleting} aria-label="Delete blog">
+              {isDeleting ? <CircularProgress size={22} /> : <DeleteForeverIcon color="error" />}
             </IconButton>
           </Box>
         )}
@@ -86,6 +97,11 @@ const Blogs = ({ title, desc, img, user, isUser, id, onDelete }) => {
         />
 
         <CardContent>
+          {deleteError && (
+            <Typography role="alert" color="error" sx={{ mb: 1 }}>
+              {deleteError}
+            </Typography>
+          )}
           <hr />
           <br />
           <Typography
