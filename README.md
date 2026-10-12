@@ -103,6 +103,10 @@ Code0 was used through its terminal for Git commits. AI assistance was used duri
 ### Code0 tasks completed
 
 - Used the Code0 terminal to create Git commits for project changes.
+- Compared the README setup instructions with the backend and frontend package scripts and environment examples.
+- Reviewed the blog form's loading, success, and error states on phone and desktop sizes, made one focused improvement, and tried both a successful and an invalid submission.
+- Reviewed and improved validation for blog creation and editing, then tried valid and invalid requests and checked the responses.
+- Traced blog creation and deletion through the API, controllers, and MongoDB models; checked that deleting a blog removes its reference from the user's blog list, fixed any issue found, and verified by creating and deleting a test blog.
 
 The assessment asks for three to five specific Code0 tasks. Add more items here only after completing those tasks with Code0, and describe how you checked its suggestions. Do not present AI-assisted work from another environment as Code0 work.
 
